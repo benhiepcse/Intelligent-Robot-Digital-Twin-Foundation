@@ -6,8 +6,8 @@
 - **Tên project:** Intelligent Robot Digital Twin Foundation
 - **Thời gian:** Tuần 1–8, từ **14/09/2026 đến 08/11/2026**
 - **Hướng phát triển:** Humanoid AI Perception kết hợp Humanoid Robot Control & Simulation
-- **Thành viên A:** Machine Learning, dữ liệu cảm biến và sensor calibration
-- **Thành viên B:** Modern Robotics, ROS 2, URDF/Xacro, Gazebo và control interface cơ bản
+- **Hiệp (Thành viên A):** Machine Learning, dữ liệu cảm biến và sensor calibration
+- **Thông (Thành viên B):** Modern Robotics, ROS 2, URDF/Xacro, Gazebo và control interface cơ bản
 - **Project kế tiếp:** P02 — Perception, State Estimation & Control Workbench
 
 ## 2. Project giải quyết vấn đề gì?
@@ -325,12 +325,19 @@ p01_intelligent_robot_digital_twin/
 
 ## 5. Backlog theo thứ tự phát triển
 
+### Quy ước nguồn học YouTube của Hiệp
+
+- Các nguồn PDF/PPTX cũ của Hiệp đã được thay bằng video YouTube. Link ở từng nhiệm vụ dẫn tới đúng video cần học.
+- Với video dạng **full course**, tài liệu ghi cả timestamp `HH:MM:SS–HH:MM:SS` và khoảng giây `Xs–Ys`; Hiệp chỉ cần học đoạn được chỉ định, không bắt buộc xem toàn bộ video.
+- Với video chuyên đề ngắn, dòng nguồn ghi **toàn bộ video** cùng thời lượng và khoảng giây `0s–Ys`.
+- Các nguồn robotics, ROS 2, URDF/Xacro, Gazebo và control của Thông được giữ nguyên vì đã trỏ trực tiếp đến giáo trình/documentation chính thức.
+
 ### [P01-I01] — Khởi tạo repository và interface contract
 
 - **Thực hiện:** Cả hai.
 - **Mô tả:** Khởi tạo monorepo, thiết lập quality gates và thống nhất interface giữa simulation với data/ML trước khi viết module chuyên môn. Contract phải xác định joint ordering, topic, message type, frame, đơn vị, timestamp, rate, timeout, CSV schema và versioning. Thiếu frame, unit hoặc required field phải khiến contract test thất bại ngay.
 - **Kiến thức:**
-  - Feature, label và training example — `AI-BML-CH01.1.pdf`.
+  - Feature, label và training example — [Machine Learning for Everybody — freeCodeCamp.org](https://www.youtube.com/watch?v=i_LwzRVP7bg&t=525s), đoạn **00:08:45–00:30:57 (giây 525–1857)**.
   - ROS 2 nodes, topics và messages — [ROS 2 Jazzy Tutorials](https://docs.ros.org/en/jazzy/Tutorials.html).
 - **Phụ thuộc:** Không.
 - **Input → Output:** bảng interface dự kiến → architecture, interface specification, schema `1.0.0` và CI skeleton.
@@ -347,10 +354,11 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-A01] — Xây dựng Sensor Data Inspector
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Xây data inspection component đọc CSV theo schema và tạo quality summary thay cho notebook EDA. Component phải kiểm tra dtype, missing values, duplicate timestamps, outlier, range validity và phân phối theo session/environment. Kết quả được xuất dưới dạng JSON có thể dùng trong CI/report và structured log, không phụ thuộc vào giao diện thủ công.
 - **Kiến thức:**
-  - Quy trình Machine Learning, feature, label và EDA — `AI-BML-CH01.1.pdf`.
+  - Quy trình Machine Learning, feature và label — [Machine Learning for Everybody — freeCodeCamp.org](https://www.youtube.com/watch?v=i_LwzRVP7bg&t=525s), đoạn **00:08:45–00:30:57 (giây 525–1857)**.
+  - EDA với `info()`, `describe()`, missing values, unique values, correlation, grouping và outlier — [Exploratory Data Analysis in Pandas — Alex The Analyst](https://www.youtube.com/watch?v=Liv6eeb1VfE), **toàn bộ video 00:00:00–00:32:13 (giây 0–1933)**.
 - **Phụ thuộc:** `P01-I01`.
 - **Input mẫu:** CSV ở Architecture cùng một record thiếu `range_raw_m`.
 - **Output mẫu:** `{"rows":3,"missing_range":1,"duplicate_rows":0,"schema_valid":true}`.
@@ -364,7 +372,7 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-B01] — Thiết lập ROS 2 workspace và runtime skeleton
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Tạo ROS 2 workspace và các package production cần thiết cho robot description, simulation, runtime và bringup. Thiết lập publisher/subscriber smoke test, parameter loading, namespace và launch skeleton. Nhiệm vụ chưa cần robot hoàn chỉnh nhưng phải chứng minh ROS graph có thể build, launch và truyền message đúng rate.
 - **Kiến thức:**
   - Workspace và package — [ROS 2 Jazzy Tutorials](https://docs.ros.org/en/jazzy/Tutorials.html).
@@ -383,11 +391,12 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-A02] — Đồng bộ, làm sạch và quản lý phiên bản dữ liệu
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Mở rộng data pipeline để xử lý timestamp lệch, duplicate, missing sensor, sai đơn vị và giá trị ngoài miền mà không chỉnh sửa raw dataset. Mỗi cleaning run tạo dataset version mới, quarantine invalid records và lưu lineage về input checksum/config. Đồng bộ phải giữ timestamp gốc, đặt tolerance rõ ràng và không tự thay missing value bằng 0.
 - **Kiến thức:**
-  - Data preparation — `AI-BML-CH01.1.pdf`.
-  - Nguyên tắc tách dữ liệu đánh giá — `AI-BML-CH01.2.pdf`.
+  - Data preparation cho Machine Learning — [Machine Learning for Everybody — freeCodeCamp.org](https://www.youtube.com/watch?v=i_LwzRVP7bg&t=1857s), đoạn **00:30:57–00:44:43 (giây 1857–2683)**.
+  - Null, invalid values và statistical outliers — [Data Analysis with Python — freeCodeCamp.org](https://www.youtube.com/watch?v=r-uOLxNrNk8&t=10038s), đoạn **02:47:18–03:25:15 (giây 10038–12315)**.
+  - Nguyên tắc đánh giá trên dữ liệu chưa nhìn thấy — [Machine Learning Fundamentals: Cross Validation — StatQuest](https://www.youtube.com/watch?v=fSytzGwwBVw), **toàn bộ video 00:00:00–00:06:04 (giây 0–364)**.
 - **Phụ thuộc:** `P01-A01`.
 - **Input mẫu:** `120 cm`, duplicate timestamp, NaN và `-0.3 m`.
 - **Output:** `1.20 m`; duplicate theo policy; NaN có flag; `-0.3 m` vào quarantine.
@@ -401,7 +410,7 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-B02] — Đặc tả configuration space và 8 DOF
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Chuyển yêu cầu upper-body thành robot specification có 8 DOF, link-joint tree, joint types, axes, limits và default pose. Cần phân biệt configuration space, task space và workspace; tên joint phải đồng nhất với ROS topic và dataset schema. Specification này là nguồn chuẩn trước khi viết Xacro hoặc kinematics code.
 - **Kiến thức:**
   - Configuration space và DOF — [Modern Robotics Ch.2.1](https://modernrobotics.northwestern.edu/nu-gm-book-resource/2-1-degrees-of-freedom-of-a-rigid-body/).
@@ -418,7 +427,7 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-B03] — Xây dựng thư viện SO(3)/SE(3)
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Xây geometry module cho rotation, homogeneous transform, quaternion, compose, inverse và biến đổi point/frame. Module phải công bố rõ active/passive convention, thứ tự quaternion và ý nghĩa `T_parent_child`. Đây là kinematics oracle độc lập dùng kiểm tra TF tree và sensor pose của URDF.
 - **Kiến thức:**
   - Homogeneous transformation và SE(3) — [Modern Robotics Ch.3.3.1](https://modernrobotics.northwestern.edu/nu-gm-book-resource/3-3-1-homogeneous-transformation-matrices/).
@@ -436,9 +445,9 @@ p01_intelligent_robot_digital_twin/
 ### [P01-I02] — Khóa sensor schema và đồng bộ thời gian
 
 - **Thực hiện:** Cả hai.
-- **Mô tả:** Ánh xạ từng ROS message sang dataset field và chốt sampling rate, timestamp source, synchronization tolerance, stale threshold, missing-data policy cùng diagnostics. Thành viên A bảo đảm schema phục vụ ML; Thành viên B bảo đảm frame, rate và message semantics đúng trong ROS graph. Recorder phải giữ timestamp gốc và không âm thầm nội suy trường bị thiếu.
+- **Mô tả:** Ánh xạ từng ROS message sang dataset field và chốt sampling rate, timestamp source, synchronization tolerance, stale threshold, missing-data policy cùng diagnostics. Hiệp bảo đảm schema phục vụ ML; Thông bảo đảm frame, rate và message semantics đúng trong ROS graph. Recorder phải giữ timestamp gốc và không âm thầm nội suy trường bị thiếu.
 - **Kiến thức:**
-  - Data preparation — `AI-BML-CH01.1.pdf`.
+  - Data preparation và xử lý missing/invalid values — [Data Analysis with Python — freeCodeCamp.org](https://www.youtube.com/watch?v=r-uOLxNrNk8&t=10038s), đoạn **02:47:18–03:25:15 (giây 10038–12315)**.
   - ROS 2 time, header và message — [ROS 2 Jazzy Tutorials](https://docs.ros.org/en/jazzy/Tutorials.html).
 - **Phụ thuộc:** `P01-A02`, `P01-B01`, `P01-B03`.
 - **Input:** sensor streams có rate khác nhau và một camera frame bị thiếu.
@@ -453,11 +462,11 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-A03] — Chia dữ liệu không gây leakage
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Triển khai split theo session hoặc sequence thay vì random từng frame, vì các frame liên tiếp gần như trùng tín hiệu. Splitter phải giữ tỷ lệ scenario/distance hợp lý, lưu seed/policy và kiểm tra overlap tự động. Manifest trở thành nguồn chuẩn cho mọi training/evaluation sau đó.
 - **Kiến thức:**
-  - Train/test split, validation và cross-validation — `AI-BML-CH01.2.pdf`.
-  - Training/future test examples — `AI-BML-CH01.1.pdf`.
+  - Train/test split, validation và cross-validation — [Machine Learning Fundamentals: Cross Validation — StatQuest](https://www.youtube.com/watch?v=fSytzGwwBVw), **toàn bộ video 00:00:00–00:06:04 (giây 0–364)**.
+  - Training examples và dữ liệu dùng để kiểm tra model — [Machine Learning for Everybody — freeCodeCamp.org](https://www.youtube.com/watch?v=i_LwzRVP7bg&t=1197s), đoạn **00:19:57–00:44:43 (giây 1197–2683)**.
 - **Phụ thuộc:** `P01-A02`, `P01-I02`.
 - **Input:** 10 session, mỗi session 500 frame.
 - **Output:** train 6, validation 2, test 2 session; overlap bằng 0.
@@ -470,7 +479,7 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-B04] — Hiện thực FK, Jacobian và numerical IK
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Từ specification và screw axes, triển khai Forward Kinematics, space/body Jacobian và numerical Inverse Kinematics cho một tay 3-DOF. Solver phải có joint limits, convergence tolerance, iteration limit và thông báo target không đạt được. Kinematics output sẽ được dùng để kiểm tra pose sinh bởi URDF/TF thay vì dựa vào hình ảnh RViz.
 - **Kiến thức:**
   - Forward Kinematics — [Modern Robotics Ch.4.1.1](https://modernrobotics.northwestern.edu/nu-gm-book-resource/4-1-1-product-of-exponentials-formula-in-the-space-frame/).
@@ -489,11 +498,12 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-A04] — Linear Regression sensor calibration
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Xây calibration model dự đoán ground-truth distance từ raw range và các feature liên quan như IMU/joint pose. Training chỉ dùng train split, model configuration được chọn bằng validation và test split chỉ mở khi nghiệm thu. Model artifact phải lưu coefficient, intercept, feature order, schema version và training metadata để online inference không dùng sai feature.
 - **Kiến thức:**
-  - Linear Regression, hypothesis và least-squares objective — `AI-BML-CH02.1.pdf`.
-  - `LinearRegression`, train/test và MSE — `AI-BML-CH02.2.pdf`.
+  - Linear Regression, least squares và cách diễn giải đường hồi quy — [Linear Regression, Clearly Explained!!! — StatQuest](https://www.youtube.com/watch?v=nk2CQITm_eo), **toàn bộ video 00:00:00–00:27:26 (giây 0–1646)**.
+  - Regression workflow và implementation — [Machine Learning for Everybody — freeCodeCamp.org](https://www.youtube.com/watch?v=i_LwzRVP7bg&t=7812s), đoạn **02:10:12–03:00:15 (giây 7812–10815)**; phần implementation tập trung ở **02:34:54–02:57:44 (giây 9294–10664)**.
+  - R² để đánh giá mức độ giải thích phương sai — [R-squared, Clearly Explained!!! — StatQuest](https://www.youtube.com/watch?v=2AQKmw14mHM), **toàn bộ video 00:00:00–00:11:01 (giây 0–661)**.
 - **Phụ thuộc:** `P01-A03`.
 - **Input:** `range_raw_m`, `imu_ax_m_s2`, `head_pan_rad`; label `ground_truth_distance_m`.
 - **Output:** calibration equation, MAE, MSE, R² và residual statistics.
@@ -507,7 +517,7 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-B05] — Xây dựng URDF/Xacro upper-body humanoid
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Tạo robot description bằng Xacro ngay từ đầu, gồm link, joint, visual, collision, inertial và limits cho toàn bộ 8 DOF. Common geometry/inertial và hai tay được module hóa thành macros có prefix để tránh lặp tên. Generated URDF phải parse được và FK/TF của nó phải khớp kinematics oracle.
 - **Kiến thức:**
   - Visual, movable và physical model — [ROS 2 URDF Tutorials](https://docs.ros.org/en/jazzy/Tutorials/Intermediate/URDF/URDF-Main.html).
@@ -526,11 +536,12 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-A05] — Gradient Descent và convergence protection
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Tự triển khai Batch Gradient Descent cho linear calibration, sau đó chạy learning-rate study với mức quá nhỏ, phù hợp và quá lớn. Optimizer phải có finite-value guard, max iterations, convergence tolerance, early stopping và divergence detection. Kết quả được đối chiếu với closed-form/sklearn và `SGDRegressor` trên cùng split.
 - **Kiến thức:**
-  - Gradient Descent, learning rate, Batch GD và SGD — `AI-BML-CH03.1.pptx`.
-  - `SGDRegressor` — `AI-BML-CH03.2.pdf`.
+  - Gradient Descent, derivative, learning rate và parameter update — [Gradient Descent, Step-by-Step — StatQuest](https://www.youtube.com/watch?v=sDv4f4s2SB8), **toàn bộ video 00:00:00–00:23:54 (giây 0–1434)**.
+  - Stochastic Gradient Descent làm cơ sở để sử dụng `SGDRegressor` — [Stochastic Gradient Descent, Clearly Explained!!! — StatQuest](https://www.youtube.com/watch?v=vMh0zPT0tLI), **toàn bộ video 00:00:00–00:10:53 (giây 0–653)**.
+  - Linear Regression implementation để đối chiếu optimizer — [Machine Learning for Everybody — freeCodeCamp.org](https://www.youtube.com/watch?v=i_LwzRVP7bg&t=9294s), đoạn **02:34:54–02:57:44 (giây 9294–10664)**.
 - **Phụ thuộc:** `P01-A04`.
 - **Input:** train split và learning rates `[1e-5, 1e-2, 1.0]`.
 - **Output:** convergence histories, divergence flags và coefficients so với baseline.
@@ -544,7 +555,7 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-B06] — Gắn sensors và kiểm tra TF2/RViz2
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Bổ sung camera, IMU và range sensor links/joints vào Xacro rồi xuất TF tree hoàn chỉnh. Sensor optical frame, quaternion convention và static transforms phải tuân thủ ROS conventions. RViz2 được dùng quan sát, nhưng correctness phải được xác nhận bằng automated TF queries và transform round-trip tests.
 - **Kiến thức:**
   - TF2 — [ROS 2 tf2 Tutorials](https://docs.ros.org/en/jazzy/Tutorials/Intermediate/Tf2/Tf2-Main.html).
@@ -561,7 +572,7 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-B07] — Spawn digital twin và sensors trong Gazebo
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Xây lab world, spawn robot/target và cấu hình camera, IMU, range cùng ground-truth distance. Gazebo Transport topics phải được bridge sang đúng ROS 2 names/types; noisy range và ground truth phải độc lập để tránh model học từ label. Scenario cho phép thay target distance và noise bằng configuration thay vì sửa SDF thủ công.
 - **Kiến thức:**
   - Gazebo model và world — [Gazebo Harmonic Get Started](https://gazebosim.org/docs/harmonic/getstarted/).
@@ -581,7 +592,7 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-B08] — Thêm ros2_control interface cơ bản
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Khai báo ros2_control command/state interfaces cho 8 joints và cấu hình Joint State Broadcaster cùng trajectory controller cơ bản. Command phải bị giới hạn theo specification, controller lifecycle phải rõ và joint state phải được recorder đọc. Đây là control boundary để P02 nâng cấp PID, computed torque và LQR.
 - **Kiến thức:**
   - ros2_control concepts — [ros2_control Jazzy](https://control.ros.org/jazzy/index.html).
@@ -600,12 +611,14 @@ p01_intelligent_robot_digital_twin/
 
 ### [P01-A06] — Đóng gói Sensor Calibration Service
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Đóng gói toàn bộ validate, clean, split, train, evaluate và online predict thành production API cùng CLI, không giữ notebook hay script tách rời. Model registry phải lưu model ID, checksum, schema version, feature order, coefficients và metrics. Calibration node phải từ chối model không tương thích và có fallback rõ khi checkpoint không thể load.
 - **Kiến thức:**
-  - ML pipeline và evaluation — `AI-BML-CH01.1.pdf`, `AI-BML-CH01.2.pdf`.
-  - Linear Regression — `AI-BML-CH02.1.pdf`, `AI-BML-CH02.2.pdf`.
-  - Gradient Descent và SGDRegressor — `AI-BML-CH03.1.pptx`, `AI-BML-CH03.2.pdf`.
+  - ML workflow, feature/label và training flow — [Machine Learning for Everybody — freeCodeCamp.org](https://www.youtube.com/watch?v=i_LwzRVP7bg&t=525s), đoạn **00:08:45–00:44:43 (giây 525–2683)**.
+  - Cross-validation và model evaluation — [Machine Learning Fundamentals: Cross Validation — StatQuest](https://www.youtube.com/watch?v=fSytzGwwBVw), **toàn bộ video 00:00:00–00:06:04 (giây 0–364)**.
+  - Linear Regression và implementation — [Machine Learning for Everybody — freeCodeCamp.org](https://www.youtube.com/watch?v=i_LwzRVP7bg&t=7812s), đoạn **02:10:12–03:00:15 (giây 7812–10815)**.
+  - Gradient Descent — [Gradient Descent, Step-by-Step — StatQuest](https://www.youtube.com/watch?v=sDv4f4s2SB8), **toàn bộ video 00:00:00–00:23:54 (giây 0–1434)**.
+  - Stochastic Gradient Descent — [Stochastic Gradient Descent, Clearly Explained!!! — StatQuest](https://www.youtube.com/watch?v=vMh0zPT0tLI), **toàn bộ video 00:00:00–00:10:53 (giây 0–653)**.
 - **Phụ thuộc:** `P01-A05`, `P01-B07`.
 - **Input mẫu:** `python tools/p01.py train --dataset-version range-v1 --method batch-gd`.
 - **Output mẫu:** `raw=1.184 m → calibrated≈1.200 m`, kèm model version và metrics.
@@ -623,7 +636,11 @@ p01_intelligent_robot_digital_twin/
 - **Thực hiện:** Cả hai.
 - **Mô tả:** Chạy toàn bộ digital twin để sinh tối thiểu 10 sessions với ít nhất 5 khoảng cách, 3 robot poses và nhiều noise seeds. Pipeline phải tự động collect, validate, quarantine, split, train, evaluate và chạy calibrated inference trong ROS graph. Hai thành viên tổng hợp evidence, khóa version `p01-v1.0.0` và bàn giao robot model, contracts, manifests, model registry cùng test fixtures cho P02.
 - **Kiến thức:**
-  - Toàn bộ Machine Learning Basic từ `AI-BML-CH01.1.pdf` đến `AI-BML-CH03.2.pdf`.
+  - ML workflow, feature/label, training và preparation — [Machine Learning for Everybody — freeCodeCamp.org](https://www.youtube.com/watch?v=i_LwzRVP7bg&t=525s), các đoạn **00:08:45–00:44:43 (giây 525–2683)** và **02:10:12–03:00:15 (giây 7812–10815)**.
+  - EDA — [Exploratory Data Analysis in Pandas — Alex The Analyst](https://www.youtube.com/watch?v=Liv6eeb1VfE), **toàn bộ video 00:00:00–00:32:13 (giây 0–1933)**.
+  - Data cleaning — [Data Analysis with Python — freeCodeCamp.org](https://www.youtube.com/watch?v=r-uOLxNrNk8&t=10038s), đoạn **02:47:18–03:25:15 (giây 10038–12315)**.
+  - Cross-validation — [Machine Learning Fundamentals: Cross Validation — StatQuest](https://www.youtube.com/watch?v=fSytzGwwBVw), **toàn bộ video 00:00:00–00:06:04 (giây 0–364)**.
+  - Gradient Descent và SGD — [Gradient Descent, Step-by-Step — StatQuest](https://www.youtube.com/watch?v=sDv4f4s2SB8), **00:00:00–00:23:54 (giây 0–1434)**; [Stochastic Gradient Descent, Clearly Explained!!! — StatQuest](https://www.youtube.com/watch?v=vMh0zPT0tLI), **00:00:00–00:10:53 (giây 0–653)**.
   - Modern Robotics Chapters 2–6.
   - ROS 2, URDF/Xacro, TF2, Gazebo và ros2_control.
 - **Phụ thuộc:** `P01-A06`, `P01-B08`.
@@ -644,7 +661,7 @@ p01_intelligent_robot_digital_twin/
 
 ## 6. Lịch 8 tuần
 
-| Tuần | Ngày | Thành viên A | Thành viên B | Tích hợp và deliverable | Giờ A/B | Gate |
+| Tuần | Ngày | Hiệp | Thông | Tích hợp và deliverable | Giờ Hiệp/Thông | Gate |
 |---:|---|---|---|---|---:|---|
 | 1 | 14–20/09/2026 | A01 | B01 | I01; repository, CI, contract và data inspector | 13/13 | Build/CI pass; schema và ROS smoke test pass |
 | 2 | 21–27/09/2026 | A02 | B02 | Versioned cleaning pipeline và robot specification | 14/13 | Raw immutable; đúng 8 DOF và joint schema |
@@ -672,12 +689,14 @@ p01_intelligent_robot_digital_twin/
 
 | Nguồn | Kiến thức | Nhiệm vụ | Sản phẩm |
 |---|---|---|---|
-| `AI-BML-CH01.1.pdf` | ML workflow, feature/label, EDA và preparation | I01, A01, A02, A03, A06, I03 | contracts, quality pipeline, dataset manifests |
-| `AI-BML-CH01.2.pdf` | Train/validation/test và evaluation | A02, A03, A06, I03 | leakage-safe split và evaluation flow |
-| `AI-BML-CH02.1.pdf` | Linear Regression và least squares | A04, A06, I03 | calibration model |
-| `AI-BML-CH02.2.pdf` | sklearn regression và MSE | A04, A06, I03 | baseline và metrics |
-| `AI-BML-CH03.1.pptx` | Gradient Descent và learning rate | A05, A06, I03 | optimizer và convergence guards |
-| `AI-BML-CH03.2.pdf` | SGDRegressor | A05, A06, I03 | reference optimizer |
+| [Machine Learning for Everybody — freeCodeCamp.org](https://www.youtube.com/watch?v=i_LwzRVP7bg) | ML workflow, feature/label, training, preparation và Linear Regression; học các đoạn 525–2683s và 7812–10815s | I01, A01, A02, A03, A04, A06, I03 | contracts, data pipeline, calibration model |
+| [Exploratory Data Analysis in Pandas — Alex The Analyst](https://www.youtube.com/watch?v=Liv6eeb1VfE) | EDA, missing values, distribution, correlation, grouping và outlier; toàn bộ 0–1933s | A01, I03 | data inspector và quality summary |
+| [Data Analysis with Python — freeCodeCamp.org](https://www.youtube.com/watch?v=r-uOLxNrNk8) | Data cleaning, null, invalid value và outlier; đoạn 10038–12315s | A02, I02, I03 | cleaning và quarantine pipeline |
+| [Machine Learning Fundamentals: Cross Validation — StatQuest](https://www.youtube.com/watch?v=fSytzGwwBVw) | Train/validation/test reasoning và cross-validation; toàn bộ 0–364s | A02, A03, A06, I03 | leakage-safe split và evaluation flow |
+| [Linear Regression, Clearly Explained!!! — StatQuest](https://www.youtube.com/watch?v=nk2CQITm_eo) | Linear Regression và least squares; toàn bộ 0–1646s | A04 | regression theory và calibration equation |
+| [R-squared, Clearly Explained!!! — StatQuest](https://www.youtube.com/watch?v=2AQKmw14mHM) | R² và interpretation; toàn bộ 0–661s | A04 | regression metrics |
+| [Gradient Descent, Step-by-Step — StatQuest](https://www.youtube.com/watch?v=sDv4f4s2SB8) | Gradient Descent, learning rate và convergence; toàn bộ 0–1434s | A05, A06, I03 | optimizer và convergence guards |
+| [Stochastic Gradient Descent, Clearly Explained!!! — StatQuest](https://www.youtube.com/watch?v=vMh0zPT0tLI) | SGD và cơ sở dùng `SGDRegressor`; toàn bộ 0–653s | A05, A06, I03 | SGD reference optimizer |
 | Modern Robotics Ch.2 | Configuration space, DOF và workspace | B02 | robot specification |
 | Modern Robotics Ch.3 | SO(3), SE(3) và transforms | B03 | geometry library |
 | Modern Robotics Ch.4–6 | FK, Jacobian và IK | B04 | kinematics oracle |
